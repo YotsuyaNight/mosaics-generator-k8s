@@ -1,0 +1,6 @@
+[submodule "mosaics-service"]
+	path = mosaics-service
+	url = git@github.com:YotsuyaNight/mosaics-service.git
+[submodule "mosaics-web"]
+	path = mosaics-web
+	url = git@github.com:YotsuyaNight/mosaics-web.git

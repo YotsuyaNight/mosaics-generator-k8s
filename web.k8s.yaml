@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: mosaics-web
+  name: mosaics-web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mosaics-web
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: mosaics-web
+    spec:
+      containers:
+      - image: mosaics-web:latest
+        name: mosaics-web
+        imagePullPolicy: Never
+        resources:
+          requests:
+            cpu: 1
+        volumeMounts:
+          - mountPath: /data
+            name: mosaics-storage
+      volumes:
+        - name: mosaics-storage
+          persistentVolumeClaim:
+            claimName: mosaics-storage-pvc
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: mosaics-web
+  name: mosaics-web
+spec:
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: mosaics-web
+  type: LoadBalancer
+status:
+  loadBalancer: {}
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: mosaics-web
+  namespace: default
+spec:
+  maxReplicas: 10
+  metrics:
+  - resource:
+      name: cpu
+      target:
+        averageUtilization: 50
+        type: Utilization
+    type: Resource
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: mosaics-web
